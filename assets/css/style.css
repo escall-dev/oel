@@ -1,0 +1,400 @@
+:root {
+  --primary-color: #040484;
+  --primary-hover: #020257;
+  --primary-light: #e6e6f7;
+  --accent-color: #edac36;
+  --accent-hover: #d69722;
+  --accent-light: #fdf5e6;
+  --dark-bg: #0b0f19;
+  --light-bg: #f8fafc;
+  --text-dark: #1e293b;
+  --text-muted: #64748b;
+  --border-color: #e2e8f0;
+  --card-shadow: 0 4px 15px rgba(4, 4, 132, 0.06);
+  --card-shadow-hover: 0 8px 25px rgba(4, 4, 132, 0.12);
+}
+
+body {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background-color: var(--light-bg);
+  color: var(--text-dark);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Navbar / Brand Header */
+.navbar-custom {
+  background: linear-gradient(135deg, #040484 0%, #020257 100%);
+  border-bottom: 3px solid var(--accent-color);
+  box-shadow: 0 4px 12px rgba(4, 4, 132, 0.15);
+}
+
+.navbar-brand {
+  font-weight: 700;
+  color: #ffffff !important;
+  font-size: 1.25rem;
+  letter-spacing: 0.5px;
+}
+
+.navbar-brand img {
+  height: 40px;
+  width: auto;
+  margin-right: 10px;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+}
+
+.nav-link {
+  color: rgba(255, 255, 255, 0.85) !important;
+  font-weight: 500;
+  padding: 0.5rem 1rem !important;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.nav-link:hover, .nav-link.active {
+  color: #ffffff !important;
+  background-color: rgba(237, 172, 54, 0.2);
+  border-bottom: 2px solid var(--accent-color);
+}
+
+.user-badge {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(237, 172, 54, 0.4);
+  color: var(--accent-color);
+  font-size: 0.85rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: 50rem;
+}
+
+/* Buttons */
+.btn-primary-custom {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+  color: #ffffff;
+  font-weight: 500;
+}
+
+.btn-primary-custom:hover, .btn-primary-custom:focus {
+  background-color: var(--primary-hover);
+  border-color: var(--primary-hover);
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(4, 4, 132, 0.25);
+}
+
+.btn-accent-custom {
+  background-color: var(--accent-color);
+  border-color: var(--accent-color);
+  color: #040484;
+  font-weight: 600;
+}
+
+.btn-accent-custom:hover, .btn-accent-custom:focus {
+  background-color: var(--accent-hover);
+  border-color: var(--accent-hover);
+  color: #020257;
+  box-shadow: 0 4px 12px rgba(237, 172, 54, 0.3);
+}
+
+.btn-outline-primary-custom {
+  color: var(--primary-color);
+  border-color: var(--primary-color);
+}
+
+.btn-outline-primary-custom:hover {
+  background-color: var(--primary-color);
+  color: #ffffff;
+}
+
+/* Cards & Containers */
+.card-custom {
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  box-shadow: var(--card-shadow);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  background: #ffffff;
+}
+
+.card-custom:hover {
+  box-shadow: var(--card-shadow-hover);
+}
+
+.card-header-custom {
+  background-color: #ffffff;
+  border-bottom: 2px solid var(--primary-light);
+  padding: 1.25rem 1.5rem;
+  border-top-left-radius: 12px !important;
+  border-top-right-radius: 12px !important;
+}
+
+/* Dashboard Stats Cards */
+.stat-card {
+  border: none;
+  border-radius: 12px;
+  padding: 1.5rem;
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--card-shadow);
+  transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--card-shadow-hover);
+}
+
+.stat-card.stat-incoming {
+  background: linear-gradient(135deg, #040484 0%, #1e1b4b 100%);
+  color: #ffffff;
+  border-left: 5px solid var(--accent-color);
+}
+
+.stat-card.stat-outgoing {
+  background: linear-gradient(135deg, #edac36 0%, #d97706 100%);
+  color: #1e1b4b;
+  border-left: 5px solid var(--primary-color);
+}
+
+.stat-card.stat-total {
+  background: #ffffff;
+  border: 1px solid var(--border-color);
+  border-left: 5px solid var(--primary-color);
+  color: var(--text-dark);
+}
+
+.stat-number {
+  font-size: 2.25rem;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.stat-icon {
+  font-size: 2.5rem;
+  opacity: 0.3;
+  position: absolute;
+  right: 1.5rem;
+  bottom: 1rem;
+}
+
+/* Tables */
+.table-custom {
+  margin-bottom: 0;
+}
+
+.table-custom th {
+  background-color: var(--primary-color);
+  color: #ffffff;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.78rem;
+  letter-spacing: 0.5px;
+  padding: 0.85rem 1rem;
+  border: none;
+}
+
+.table-custom th:first-child {
+  border-top-left-radius: 8px;
+}
+
+.table-custom th:last-child {
+  border-top-right-radius: 8px;
+}
+
+.table-custom td {
+  padding: 0.85rem 1rem;
+  vertical-align: middle;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.table-custom tbody tr:hover {
+  background-color: var(--primary-light);
+}
+
+/* Badges */
+.badge-incoming {
+  background-color: rgba(4, 4, 132, 0.1);
+  color: var(--primary-color);
+  border: 1px solid rgba(4, 4, 132, 0.2);
+  font-weight: 600;
+  padding: 0.35em 0.65em;
+  border-radius: 50rem;
+}
+
+.badge-outgoing {
+  background-color: rgba(237, 172, 54, 0.15);
+  color: #b45309;
+  border: 1px solid rgba(237, 172, 54, 0.4);
+  font-weight: 600;
+  padding: 0.35em 0.65em;
+  border-radius: 50rem;
+}
+
+.badge-role {
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  padding: 0.3em 0.6em;
+  border-radius: 4px;
+}
+
+.badge-role-admin {
+  background-color: var(--primary-color);
+  color: #ffffff;
+}
+
+.badge-role-encoder {
+  background-color: var(--accent-color);
+  color: #040484;
+}
+
+.badge-role-viewer {
+  background-color: #64748b;
+  color: #ffffff;
+}
+
+/* Login Page Styling */
+.login-body {
+  background: linear-gradient(135deg, #02023d 0%, #040484 50%, #0f172a 100%);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem;
+}
+
+.login-card {
+  width: 100%;
+  max-width: 440px;
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+  border: 2px solid var(--accent-color);
+  overflow: hidden;
+}
+
+.login-header {
+  background: linear-gradient(135deg, #040484 0%, #020257 100%);
+  padding: 2.25rem 2rem 1.75rem;
+  text-align: center;
+  color: #ffffff;
+  border-bottom: 4px solid var(--accent-color);
+}
+
+.login-logo {
+  height: 90px;
+  width: auto;
+  margin-bottom: 1rem;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+}
+
+.login-title {
+  font-weight: 800;
+  font-size: 1.35rem;
+  color: #ffffff;
+  margin-bottom: 0.25rem;
+  letter-spacing: 0.5px;
+}
+
+.login-subtitle {
+  color: var(--accent-color);
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.login-body-content {
+  padding: 2rem;
+}
+
+/* Form Controls */
+.form-control:focus, .form-select:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 0.25rem rgba(4, 4, 132, 0.15);
+}
+
+.form-label {
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: var(--text-dark);
+  margin-bottom: 0.4rem;
+}
+
+/* Attachment Checklist Card */
+.attachment-box {
+  background-color: var(--light-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 1rem;
+  max-height: 280px;
+  overflow-y: auto;
+}
+
+.attachment-item {
+  background: #ffffff;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  padding: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.attachment-item:last-child {
+  margin-bottom: 0;
+}
+
+/* Modal Scrollbar & Layout Fixes */
+.modal-dialog-scrollable {
+  max-height: calc(100vh - 2rem);
+}
+
+.modal-dialog-scrollable .modal-content {
+  max-height: calc(100vh - 2rem);
+  overflow: hidden;
+}
+
+.modal-dialog-scrollable .modal-body {
+  overflow-y: auto !important;
+  max-height: calc(100vh - 12rem);
+}
+
+.modal-dialog-scrollable .modal-content > form {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  max-height: calc(100vh - 2rem);
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* Custom Scrollbar Styles */
+.modal-body::-webkit-scrollbar,
+.attachment-box::-webkit-scrollbar {
+  width: 8px;
+}
+
+.modal-body::-webkit-scrollbar-track,
+.attachment-box::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 4px;
+}
+
+.modal-body::-webkit-scrollbar-thumb,
+.attachment-box::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+.modal-body::-webkit-scrollbar-thumb:hover,
+.attachment-box::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Footer */
+footer {
+  margin-top: auto;
+  background-color: #ffffff;
+  border-top: 1px solid var(--border-color);
+  padding: 1rem 0;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
