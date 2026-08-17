@@ -74,6 +74,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $documentTitle = trim($_POST['document_title'] ?? '');
         $categoryId = intval($_POST['category_id'] ?? 0);
         $documentTypeId = intval($_POST['document_type_id'] ?? 0);
+        $documentTypeId = $documentTypeId > 0 ? $documentTypeId : null;
         $recipientOffice = trim($_POST['recipient_office'] ?? '');
         $documentDate = trim($_POST['document_date'] ?? '');
         $timeLog = trim($_POST['time_log'] ?? '');
@@ -84,8 +85,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $timeLog = $timeLog === '' ? null : $timeLog;
 
         // Basic Server Validation
-        if (empty($documentTitle) || $categoryId <= 0 || $documentTypeId <= 0 || empty($documentDate)) {
-            setFlash('danger', 'Please fill in all required fields (Title, Category, Type, Date).');
+        if (empty($documentTitle) || $categoryId <= 0 || empty($documentDate)) {
+            setFlash('danger', 'Please fill in all required fields (Title, Category, Date).');
             header("Location: outgoing.php");
             exit();
         }
@@ -575,8 +576,8 @@ include __DIR__ . '/includes/navbar.php';
 
                     <!-- Type Dropdown (Filtered by Category via JS) -->
                     <div class="col-md-6">
-                        <label for="document_type_id" class="form-label">Document Type <span class="text-danger">*</span></label>
-                        <select class="form-select" id="document_type_id" name="document_type_id" required>
+                        <label for="document_type_id" class="form-label">Document Type</label>
+                        <select class="form-select" id="document_type_id" name="document_type_id">
                             <option value="">-- Select Category First --</option>
                         </select>
                     </div>

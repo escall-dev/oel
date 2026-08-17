@@ -40,7 +40,7 @@ CREATE TABLE IF NOT EXISTS `documents` (
   `reference_number` VARCHAR(100) NULL DEFAULT NULL,
   `document_title` VARCHAR(255) NOT NULL,
   `category_id` INT NOT NULL,
-  `document_type_id` INT NOT NULL,
+  `document_type_id` INT NULL,
   `direction` ENUM('Incoming', 'Outgoing') NOT NULL,
   `origin_source` VARCHAR(255) NULL,
   `recipient_office` VARCHAR(255) NULL,
