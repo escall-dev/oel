@@ -56,7 +56,7 @@ if (isset($_GET['download']) && $_GET['download'] == '1') {
             d.created_at
         FROM documents d
         JOIN categories c ON d.category_id = c.id
-        JOIN document_types dt ON d.document_type_id = dt.id
+        LEFT JOIN document_types dt ON d.document_type_id = dt.id
         LEFT JOIN users u ON d.encoded_by = u.id
         WHERE $whereSql
         ORDER BY d.id DESC
@@ -153,7 +153,7 @@ $stmtDocs = $pdo->prepare("
     SELECT d.*, c.category_name, dt.type_name, u.full_name AS encoder_name
     FROM documents d
     JOIN categories c ON d.category_id = c.id
-    JOIN document_types dt ON d.document_type_id = dt.id
+    LEFT JOIN document_types dt ON d.document_type_id = dt.id
     LEFT JOIN users u ON d.encoded_by = u.id
     WHERE $whereSql
     ORDER BY d.id DESC
