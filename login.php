@@ -73,7 +73,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <label for="username" class="form-label">Employee ID</label>
                     <div class="input-group">
                         <span class="input-group-text bg-light text-muted"><i class="bi bi-person-badge"></i></span>
-                        <input type="text" class="form-control" id="username" name="username" placeholder="e.g. 061920" required autofocus value="<?= sanitize($_POST['username'] ?? '') ?>">
+                        <input type="text" class="form-control" id="username" name="username" placeholder="e.g. 1234567" required autofocus value="<?= sanitize($_POST['username'] ?? '') ?>">
                     </div>
                 </div>
 
