@@ -24,18 +24,8 @@ $currentPage = basename($_SERVER['PHP_SELF']);
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link <?= ($currentPage === 'documents.php') ? 'active' : '' ?>" href="documents.php">
-                        <i class="bi bi-folder2-open me-1"></i> All Documents
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link <?= ($currentPage === 'incoming.php') ? 'active' : '' ?>" href="incoming.php">
-                        <i class="bi bi-box-arrow-in-down me-1"></i> Incoming Log
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link <?= ($currentPage === 'outgoing.php') ? 'active' : '' ?>" href="outgoing.php">
-                        <i class="bi bi-box-arrow-up me-1"></i> Outgoing Log
+                    <a class="nav-link <?= ($currentPage === 'document_log.php') ? 'active' : '' ?>" href="document_log.php">
+                        <i class="bi bi-box-arrow-in-down me-1"></i> Document Log
                     </a>
                 </li>
                 <li class="nav-item">

@@ -5,8 +5,7 @@ requireLogin();
 $user = currentUser();
 
 // Metrics Queries
-$totalIncoming = $pdo->query("SELECT COUNT(*) FROM documents WHERE direction = 'Incoming'")->fetchColumn();
-$totalOutgoing = $pdo->query("SELECT COUNT(*) FROM documents WHERE direction = 'Outgoing'")->fetchColumn();
+
 $totalDocs = $pdo->query("SELECT COUNT(*) FROM documents")->fetchColumn();
 $totalCategories = $pdo->query("SELECT COUNT(*) FROM categories")->fetchColumn();
 
@@ -47,11 +46,8 @@ include __DIR__ . '/includes/navbar.php';
         </div>
         <?php if (!hasRole('viewer')): ?>
         <div class="mt-3 mt-md-0 d-flex gap-2">
-            <a href="incoming.php?action=add" class="btn btn-primary-custom shadow-sm">
-                <i class="bi bi-plus-circle me-1"></i> Log Incoming
-            </a>
-            <a href="outgoing.php?action=add" class="btn btn-accent-custom shadow-sm">
-                <i class="bi bi-plus-circle me-1"></i> Log Outgoing
+            <a href="document_log.php?action=add" class="btn btn-primary-custom shadow-sm">
+                <i class="bi bi-plus-circle me-1"></i> Log Document
             </a>
         </div>
         <?php endif; ?>
@@ -59,25 +55,7 @@ include __DIR__ . '/includes/navbar.php';
 
     <!-- Stat Cards Row -->
     <div class="row g-3 mb-4">
-        <!-- Incoming Stat -->
-        <div class="col-12 col-sm-6 col-xl-3">
-            <div class="stat-card stat-incoming">
-                <div class="text-uppercase small fw-bold text-white-50">Incoming Documents</div>
-                <div class="stat-number my-1"><?= number_format($totalIncoming) ?></div>
-                <div class="small text-white-50"><i class="bi bi-arrow-down-left-circle me-1"></i> Total files received</div>
-                <i class="bi bi-box-arrow-in-down stat-icon"></i>
-            </div>
-        </div>
 
-        <!-- Outgoing Stat -->
-        <div class="col-12 col-sm-6 col-xl-3">
-            <div class="stat-card stat-outgoing">
-                <div class="text-uppercase small fw-bold text-dark-50">Outgoing Documents</div>
-                <div class="stat-number my-1"><?= number_format($totalOutgoing) ?></div>
-                <div class="small text-dark-50"><i class="bi bi-arrow-up-right-circle me-1"></i> Total files dispatched</div>
-                <i class="bi bi-box-arrow-up stat-icon"></i>
-            </div>
-        </div>
 
         <!-- Total Records -->
         <div class="col-12 col-sm-6 col-xl-3">
@@ -117,7 +95,6 @@ include __DIR__ . '/includes/navbar.php';
                             <thead>
                                 <tr>
                                     <th>Ref #</th>
-                                    <th>Direction</th>
                                     <th>Title</th>
                                     <th>Category / Type</th>
                                     <th>Date</th>
@@ -130,20 +107,14 @@ include __DIR__ . '/includes/navbar.php';
                                 <tr>
                                     <td colspan="7" class="text-center py-4 text-muted">
                                         <i class="bi bi-inbox fs-2 d-block mb-1 opacity-50"></i>
-                                        No log entries found. Start by adding an Incoming or Outgoing document log.
+                                        No log entries found. Start by adding a document log.
                                     </td>
                                 </tr>
                                 <?php else: ?>
                                     <?php foreach ($recentEntries as $entry): ?>
                                     <tr>
                                         <td class="fw-bold text-dark" style="font-size:0.85rem;"><?= sanitize($entry['reference_number']) ?></td>
-                                        <td>
-                                            <?php if ($entry['direction'] === 'Incoming'): ?>
-                                                <span class="badge badge-incoming"><i class="bi bi-arrow-down-left me-1"></i> Incoming</span>
-                                            <?php else: ?>
-                                                <span class="badge badge-outgoing"><i class="bi bi-arrow-up-right me-1"></i> Outgoing</span>
-                                            <?php endif; ?>
-                                        </td>
+
                                         <td style="max-width:200px;" class="text-truncate" title="<?= sanitize($entry['document_title']) ?>">
                                             <?= sanitize($entry['document_title']) ?>
                                         </td>
@@ -154,7 +125,7 @@ include __DIR__ . '/includes/navbar.php';
                                         <td class="text-nowrap small text-muted"><?= date('M d, Y', strtotime($entry['document_date'])) ?></td>
                                         <td class="text-nowrap small text-muted"><i class="bi bi-clock me-1 opacity-75"></i><?= !empty($entry['time_log']) ? date('h:i A', strtotime($entry['time_log'])) : (!empty($entry['created_at']) ? date('h:i A', strtotime($entry['created_at'])) : '—') ?></td>
                                         <td class="text-end">
-                                            <a href="<?= ($entry['direction'] === 'Incoming') ? 'incoming.php' : 'outgoing.php' ?>?view=<?= $entry['id'] ?>" class="btn btn-sm btn-outline-primary-custom py-1 px-2">
+                                            <a href="document_log.php?view=<?= $entry['id'] ?>" class="btn btn-sm btn-outline-primary-custom py-1 px-2">
                                                 <i class="bi bi-eye me-1"></i> View
                                             </a>
                                         </td>

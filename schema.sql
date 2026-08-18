@@ -38,10 +38,10 @@ CREATE TABLE IF NOT EXISTS `attachment_items` (
 CREATE TABLE IF NOT EXISTS `documents` (
   `id` INT AUTO_INCREMENT PRIMARY KEY,
   `reference_number` VARCHAR(100) NULL DEFAULT NULL,
+  `direction` ENUM('Incoming', 'Outgoing') NOT NULL,
   `document_title` VARCHAR(255) NOT NULL,
   `category_id` INT NOT NULL,
   `document_type_id` INT NULL,
-  `direction` ENUM('Incoming', 'Outgoing') NOT NULL,
   `origin_source` VARCHAR(255) NULL,
   `recipient_office` VARCHAR(255) NULL,
   `document_date` DATE NOT NULL,

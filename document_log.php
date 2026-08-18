@@ -9,7 +9,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Only Admin & Encoder can create/edit/delete
     if (!hasRole(['admin', 'encoder'])) {
         setFlash('danger', 'Viewer role cannot modify document entries.');
-        header("Location: incoming.php");
+        header("Location: document_log.php");
         exit();
     }
 
@@ -19,7 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($formAction === 'delete') {
         if (!hasRole('admin')) {
             setFlash('danger', 'Only administrators can delete log records.');
-            header("Location: incoming.php");
+            header("Location: document_log.php");
             exit();
         }
         $docId = intval($_POST['document_id'] ?? 0);
@@ -36,14 +36,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmtDel->execute([':id' => $docId]);
             setFlash('success', 'Document record deleted successfully.');
         }
-        header("Location: incoming.php");
+        header("Location: document_log.php");
         exit();
     }
 
     if ($formAction === 'bulk_delete') {
         if (!hasRole('admin')) {
             setFlash('danger', 'Only administrators can delete log records.');
-            header("Location: incoming.php");
+            header("Location: document_log.php");
             exit();
         }
         $selectedIds = $_POST['selected_ids'] ?? [];
@@ -62,7 +62,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 setFlash('success', count($ids) . ' document record(s) deleted successfully.');
             }
         }
-        header("Location: incoming.php");
+        header("Location: document_log.php");
         exit();
     }
 
@@ -87,7 +87,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Basic Server Validation
         if (empty($documentTitle) || $categoryId <= 0 || empty($documentDate)) {
             setFlash('danger', 'Please fill in all required fields (Title, Category, Date).');
-            header("Location: incoming.php");
+            header("Location: document_log.php");
             exit();
         }
 
@@ -103,7 +103,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             if ($stmtCheck->fetchColumn() > 0) {
                 setFlash('danger', "Error: Reference Number '$referenceNumber' already exists in the system.");
-                header("Location: incoming.php");
+                header("Location: document_log.php");
                 exit();
             }
         }
@@ -142,9 +142,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 // Insert New Document
                 $stmtInsert = $pdo->prepare("
                     INSERT INTO documents 
-                        (reference_number, document_title, category_id, document_type_id, origin_source, document_date, time_log, remarks, encoded_by)
+                        (reference_number, direction, document_title, category_id, document_type_id, origin_source, recipient_office, document_date, time_log, remarks, encoded_by)
                     VALUES 
-                        (:ref, :title, :cat, :type, :origin, :doc_date, :time_log, :remarks, :encoded_by)
+                        (:ref, 'Incoming', :title, :cat, :type, :origin, NULL, :doc_date, :time_log, :remarks, :encoded_by)
                 ");
                 $stmtInsert->execute([
                     ':ref' => $referenceNumber,
@@ -220,7 +220,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             setFlash('danger', 'Database Error: ' . $e->getMessage());
         }
 
-        header("Location: incoming.php");
+        header("Location: document_log.php");
         exit();
     }
 }
@@ -339,7 +339,7 @@ include __DIR__ . '/includes/navbar.php';
     <!-- Search & Filter Card -->
     <div class="card card-custom mb-4">
         <div class="card-body p-3">
-            <form method="GET" action="incoming.php" class="row g-2 align-items-end">
+            <form method="GET" action="document_log.php" class="row g-2 align-items-end">
                 <div class="col-12 col-md-3">
                     <label class="form-label small fw-semibold mb-1">Search Keyword</label>
                     <input type="text" name="search" class="form-control form-control-sm" placeholder="Ref #, Title, or Origin..." value="<?= sanitize($search) ?>">
@@ -378,7 +378,7 @@ include __DIR__ . '/includes/navbar.php';
                     <button type="submit" class="btn btn-sm btn-primary-custom w-100" title="Apply Filter">
                         <i class="bi bi-search"></i>
                     </button>
-                    <a href="incoming.php" class="btn btn-sm btn-outline-secondary" title="Reset Filters">
+                    <a href="document_log.php" class="btn btn-sm btn-outline-secondary" title="Reset Filters">
                         <i class="bi bi-arrow-counterclockwise"></i>
                     </a>
                 </div>
@@ -387,7 +387,7 @@ include __DIR__ . '/includes/navbar.php';
     </div>
 
     <!-- Incoming Documents Table -->
-    <form method="POST" action="incoming.php" id="bulkDeleteForm">
+    <form method="POST" action="document_log.php" id="bulkDeleteForm">
         <input type="hidden" name="form_action" value="bulk_delete">
         <div class="card card-custom">
             <div class="card-header card-header-custom d-flex justify-content-between align-items-center">
@@ -449,7 +449,7 @@ include __DIR__ . '/includes/navbar.php';
                                     <td class="small text-nowrap text-muted"><i class="bi bi-clock me-1 text-primary opacity-75"></i><?= !empty($doc['time_log']) ? date('h:i A', strtotime($doc['time_log'])) : (!empty($doc['created_at']) ? date('h:i A', strtotime($doc['created_at'])) : '—') ?></td>
                                     <td class="small text-muted"><?= sanitize($doc['encoder_name'] ?: 'System') ?></td>
                                     <td class="text-end text-nowrap">
-                                        <a href="incoming.php?view=<?= $doc['id'] ?>" class="btn btn-sm btn-outline-primary-custom py-1 px-2" title="View Details">
+                                        <a href="document_log.php?view=<?= $doc['id'] ?>" class="btn btn-sm btn-outline-primary-custom py-1 px-2" title="View Details">
                                             <i class="bi bi-eye"></i> View
                                         </a>
                                         <?php if (hasRole(['admin', 'encoder'])): ?>
@@ -480,7 +480,7 @@ include __DIR__ . '/includes/navbar.php';
 <!-- Modal: Add / Edit Incoming Document -->
 <div class="modal fade" id="addDocumentModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-scrollable">
-        <form method="POST" action="incoming.php" enctype="multipart/form-data" class="modal-content border-0 shadow-lg">
+        <form method="POST" action="document_log.php" enctype="multipart/form-data" class="modal-content border-0 shadow-lg">
             <div class="modal-header text-white" style="background: linear-gradient(135deg, #040484 0%, #020257 100%); border-bottom: 3px solid var(--accent-color);">
                 <h5 class="modal-title fw-bold" id="modalTitle">
                     <i class="bi bi-box-arrow-in-down me-2"></i> Log New Document
@@ -574,7 +574,7 @@ include __DIR__ . '/includes/navbar.php';
                 <h5 class="modal-title fw-bold">
                     <i class="bi bi-file-earmark-text me-2 text-warning"></i> Document Entry Details
                 </h5>
-                <a href="incoming.php" class="btn-close btn-close-white"></a>
+                <a href="document_log.php" class="btn-close btn-close-white"></a>
             </div>
             <div class="modal-body p-4">
                 <div class="row g-3 mb-4">
@@ -649,7 +649,7 @@ include __DIR__ . '/includes/navbar.php';
                 <?php endif; ?>
             </div>
             <div class="modal-footer bg-light">
-                <a href="incoming.php" class="btn btn-secondary">Close</a>
+                <a href="document_log.php" class="btn btn-secondary">Close</a>
             </div>
         </div>
     </div>

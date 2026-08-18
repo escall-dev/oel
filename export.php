@@ -4,7 +4,6 @@ requireLogin();
 
 // Export Action Handler (CSV Download)
 if (isset($_GET['download']) && $_GET['download'] == '1') {
-    $direction = trim($_GET['direction'] ?? 'all');
     $filterCategory = intval($_GET['category_id'] ?? 0);
     $filterType = intval($_GET['type_id'] ?? 0);
     $fromDate = trim($_GET['from_date'] ?? '');
@@ -12,11 +11,6 @@ if (isset($_GET['download']) && $_GET['download'] == '1') {
 
     $whereClause = ["1=1"];
     $params = [];
-
-    if ($direction === 'Incoming' || $direction === 'Outgoing') {
-        $whereClause[] = "d.direction = :dir";
-        $params[':dir'] = $direction;
-    }
 
     if ($filterCategory > 0) {
         $whereClause[] = "d.category_id = :cat_id";
@@ -43,12 +37,10 @@ if (isset($_GET['download']) && $_GET['download'] == '1') {
     $stmtExp = $pdo->prepare("
         SELECT 
             d.reference_number,
-            d.direction,
             d.document_title,
             c.category_name,
             dt.type_name,
             d.origin_source,
-            d.recipient_office,
             d.document_date,
             d.time_log,
             d.remarks,
@@ -78,12 +70,10 @@ if (isset($_GET['download']) && $_GET['download'] == '1') {
     // Headers
     fputcsv($output, [
         'Reference Number',
-        'Direction',
         'Document Title',
         'Category',
         'Document Type',
         'Origin / Source',
-        'Recipient Office',
         'Document Date',
         'Time Log',
         'Remarks',
@@ -94,12 +84,10 @@ if (isset($_GET['download']) && $_GET['download'] == '1') {
     foreach ($exportData as $row) {
         fputcsv($output, [
             $row['reference_number'],
-            $row['direction'],
             $row['document_title'],
             $row['category_name'],
             $row['type_name'],
             $row['origin_source'] ?: '',
-            $row['recipient_office'] ?: '',
             $row['document_date'],
             !empty($row['time_log']) ? date('h:i A', strtotime($row['time_log'])) : '',
             $row['remarks'] ?: '',
@@ -113,7 +101,6 @@ if (isset($_GET['download']) && $_GET['download'] == '1') {
 }
 
 // Page Render Filter Preview
-$direction = trim($_GET['direction'] ?? 'all');
 $filterCategory = intval($_GET['category_id'] ?? 0);
 $filterType = intval($_GET['type_id'] ?? 0);
 $fromDate = trim($_GET['from_date'] ?? '');
@@ -121,11 +108,6 @@ $toDate = trim($_GET['to_date'] ?? '');
 
 $whereClause = ["1=1"];
 $params = [];
-
-if ($direction === 'Incoming' || $direction === 'Outgoing') {
-    $whereClause[] = "d.direction = :dir";
-    $params[':dir'] = $direction;
-}
 
 if ($filterCategory > 0) {
     $whereClause[] = "d.category_id = :cat_id";
@@ -194,14 +176,7 @@ include __DIR__ . '/includes/navbar.php';
         </div>
         <div class="card-body p-4">
             <form method="GET" action="export.php" id="exportForm" class="row g-3 align-items-end">
-                <div class="col-12 col-md-3">
-                    <label class="form-label fw-semibold">Direction / Type</label>
-                    <select name="direction" class="form-select" onchange="this.form.submit()">
-                        <option value="all" <?= ($direction === 'all') ? 'selected' : '' ?>>All Documents (Incoming & Outgoing)</option>
-                        <option value="Incoming" <?= ($direction === 'Incoming') ? 'selected' : '' ?>>Incoming Only</option>
-                        <option value="Outgoing" <?= ($direction === 'Outgoing') ? 'selected' : '' ?>>Outgoing Only</option>
-                    </select>
-                </div>
+
 
                 <div class="col-12 col-md-3">
                     <label class="form-label fw-semibold">Category</label>
@@ -245,7 +220,6 @@ include __DIR__ . '/includes/navbar.php';
                     <?php
                     $queryString = http_build_query([
                         'download' => '1',
-                        'direction' => $direction,
                         'category_id' => $filterCategory,
                         'type_id' => $filterType,
                         'from_date' => $fromDate,
@@ -274,11 +248,10 @@ include __DIR__ . '/includes/navbar.php';
                     <thead>
                         <tr>
                             <th>Ref #</th>
-                            <th>Direction</th>
                             <th>Title</th>
                             <th>Category</th>
                             <th>Type</th>
-                            <th>Origin / Recipient</th>
+                            <th>Origin / Source</th>
                             <th>Document Date</th>
                             <th>Time Log</th>
                             <th>Encoded By</th>
@@ -296,17 +269,10 @@ include __DIR__ . '/includes/navbar.php';
                             <?php foreach ($previewDocuments as $doc): ?>
                             <tr>
                                 <td class="fw-bold text-primary font-monospace" style="font-size:0.85rem;"><?= sanitize($doc['reference_number']) ?></td>
-                                <td>
-                                    <?php if ($doc['direction'] === 'Incoming'): ?>
-                                        <span class="badge badge-incoming"><i class="bi bi-arrow-down-left me-1"></i> Incoming</span>
-                                    <?php else: ?>
-                                        <span class="badge badge-outgoing"><i class="bi bi-arrow-up-right me-1"></i> Outgoing</span>
-                                    <?php endif; ?>
-                                </td>
                                 <td class="fw-semibold text-dark"><?= sanitize($doc['document_title']) ?></td>
                                 <td><span class="badge bg-light text-dark border"><?= sanitize($doc['category_name']) ?></span></td>
                                 <td class="small text-secondary"><?= sanitize($doc['type_name']) ?></td>
-                                <td class="small"><?= sanitize(($doc['direction'] === 'Incoming') ? $doc['origin_source'] : $doc['recipient_office']) ?></td>
+                                <td class="small"><?= sanitize($doc['origin_source']) ?></td>
                                 <td class="small text-nowrap"><?= date('M d, Y', strtotime($doc['document_date'])) ?></td>
                                 <td class="small text-nowrap text-muted"><i class="bi bi-clock me-1 opacity-75"></i><?= !empty($doc['time_log']) ? date('h:i A', strtotime($doc['time_log'])) : (!empty($doc['created_at']) ? date('h:i A', strtotime($doc['created_at'])) : '—') ?></td>
                                 <td class="small text-muted"><?= sanitize($doc['encoder_name'] ?: 'System') ?></td>
