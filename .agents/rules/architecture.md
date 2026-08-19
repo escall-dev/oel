@@ -8,16 +8,9 @@ description: Explains the unified Document Logbook architecture and prevents rev
 This project was recently refactored from a multi-direction tracking system (Incoming/Outgoing) to a unified **Document Logbook**. When making changes or additions to the codebase, adhere strictly to these architectural guidelines:
 
 ## Core Principles
-1. **No Directionality**: The system no longer tracks whether a document is "Incoming" or "Outgoing". Do not add, reference, or expect a `direction` column in the database or the UI.
+1. **Directionality**: The system tracks document direction via "Incoming" and "Outgoing" Categories.
 2. **Unified Interface**: The primary log interface is `document_log.php`. The old files `incoming.php`, `outgoing.php`, and `documents.php` have been deprecated and removed. Never reference them in navigation or code.
-3. **Origin/Source Only**: Use the `origin_source` column to record where a document came from or where it is going. Do not use or reintroduce `recipient_office`.
-
-## Forbidden Terminology
-- Avoid terms like "Incoming Log", "Outgoing Log", "Log Incoming", or "Log Outgoing" in the UI. 
-- Use "Document Log", "Log Document", or "Log Entry" instead.
+3. **Origin and Destination**: Use the `origin_source` column for the origin, and reintroduce/use the `recipient_office` (Office Destination) column for where it is going.
 
 ## Database Schema
-The `documents` table MUST NOT contain the following columns:
-- `direction`
-- `recipient_office`
-All queries to the database must omit these fields.
+The `documents` table MUST contain the `recipient_office` column. The `direction` column logic is superseded by using "Incoming" and "Outgoing" as Category values.

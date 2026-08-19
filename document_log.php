@@ -76,13 +76,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $documentTypeId = intval($_POST['document_type_id'] ?? 0);
         $documentTypeId = $documentTypeId > 0 ? $documentTypeId : null;
         $originSource = trim($_POST['origin_source'] ?? '');
+        $recipientOffice = trim($_POST['recipient_office'] ?? '');
         $documentDate = trim($_POST['document_date'] ?? '');
-        $timeLog = trim($_POST['time_log'] ?? '');
         $remarks = trim($_POST['remarks'] ?? '');
+        $remarksAction = trim($_POST['remarks_action'] ?? '');
 
         // Store empty reference as NULL
         $referenceNumber = $referenceNumber === '' ? null : $referenceNumber;
-        $timeLog = $timeLog === '' ? null : $timeLog;
 
         // Basic Server Validation
         if (empty($documentTitle) || $categoryId <= 0 || empty($documentDate)) {
@@ -120,9 +120,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         category_id = :cat,
                         document_type_id = :type,
                         origin_source = :origin,
+                        recipient_office = :destination,
                         document_date = :doc_date,
-                        time_log = :time_log,
-                        remarks = :remarks
+                        time_log = NULL,
+                        remarks = :remarks,
+                        remarks_action = :remarks_action
                     WHERE id = :id
                 ");
                 $stmtUpdate->execute([
@@ -131,9 +133,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     ':cat' => $categoryId,
                     ':type' => $documentTypeId,
                     ':origin' => $originSource,
+                    ':destination' => $recipientOffice,
                     ':doc_date' => $documentDate,
-                    ':time_log' => $timeLog,
                     ':remarks' => $remarks,
+                    ':remarks_action' => $remarksAction,
                     ':id' => $docId
                 ]);
                 $savedDocId = $docId;
@@ -142,9 +145,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 // Insert New Document
                 $stmtInsert = $pdo->prepare("
                     INSERT INTO documents 
-                        (reference_number, direction, document_title, category_id, document_type_id, origin_source, recipient_office, document_date, time_log, remarks, encoded_by)
+                        (reference_number, direction, document_title, category_id, document_type_id, origin_source, recipient_office, document_date, time_log, remarks, remarks_action, encoded_by)
                     VALUES 
-                        (:ref, 'Incoming', :title, :cat, :type, :origin, NULL, :doc_date, :time_log, :remarks, :encoded_by)
+                        (:ref, 'Incoming', :title, :cat, :type, :origin, :destination, :doc_date, NULL, :remarks, :remarks_action, :encoded_by)
                 ");
                 $stmtInsert->execute([
                     ':ref' => $referenceNumber,
@@ -152,9 +155,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     ':cat' => $categoryId,
                     ':type' => $documentTypeId,
                     ':origin' => $originSource,
+                    ':destination' => $recipientOffice,
                     ':doc_date' => $documentDate,
-                    ':time_log' => $timeLog,
                     ':remarks' => $remarks,
+                    ':remarks_action' => $remarksAction,
                     ':encoded_by' => $user['id']
                 ]);
                 $savedDocId = $pdo->lastInsertId();
@@ -278,7 +282,7 @@ $stmtDocs->execute($params);
 $documents = $stmtDocs->fetchAll();
 
 // Fetch Categories & Types for Filter Dropdowns
-$allCategories = $pdo->query("SELECT * FROM categories ORDER BY category_name ASC")->fetchAll();
+$allCategories = $pdo->query("SELECT * FROM categories WHERE id IN (1, 2) ORDER BY category_name ASC")->fetchAll();
 $allTypes = [];
 if ($filterCategory > 0) {
     $stmtT = $pdo->prepare("SELECT * FROM document_types WHERE category_id = :c ORDER BY type_name ASC");
@@ -340,28 +344,17 @@ include __DIR__ . '/includes/navbar.php';
     <div class="card card-custom mb-4">
         <div class="card-body p-3">
             <form method="GET" action="document_log.php" class="row g-2 align-items-end">
-                <div class="col-12 col-md-3">
+                <div class="col-12 col-md-4">
                     <label class="form-label small fw-semibold mb-1">Search Keyword</label>
                     <input type="text" name="search" class="form-control form-control-sm" placeholder="Ref #, Title, or Origin..." value="<?= sanitize($search) ?>">
                 </div>
-                <div class="col-12 col-md-2">
+                <div class="col-12 col-md-3">
                     <label class="form-label small fw-semibold mb-1">Category</label>
                     <select name="category_id" class="form-select form-select-sm" onchange="this.form.submit()">
                         <option value="">All Categories</option>
                         <?php foreach ($allCategories as $cat): ?>
                         <option value="<?= $cat['id'] ?>" <?= ($filterCategory === (int)$cat['id']) ? 'selected' : '' ?>>
                             <?= sanitize($cat['category_name']) ?>
-                        </option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
-                <div class="col-12 col-md-2">
-                    <label class="form-label small fw-semibold mb-1">Document Type</label>
-                    <select name="type_id" class="form-select form-select-sm">
-                        <option value="">All Types</option>
-                        <?php foreach ($allTypes as $t): ?>
-                        <option value="<?= $t['id'] ?>" <?= ($filterType === (int)$t['id']) ? 'selected' : '' ?>>
-                            <?= sanitize($t['type_name']) ?>
                         </option>
                         <?php endforeach; ?>
                     </select>
@@ -416,11 +409,11 @@ include __DIR__ . '/includes/navbar.php';
                                 <th>Ref #</th>
                                 <th>Document Title</th>
                                 <th>Category</th>
-                                <th>Type</th>
-                                <th>Origin / Source</th>
-                                <th>Document Date</th>
-                                <th>Time Log</th>
-                                <th>Encoded By</th>
+                                <th>Remarks / Action</th>
+                                <th>Office Origin</th>
+                                <th>Office Destination</th>
+                                <th>Date</th>
+                                <th>Received/Released by</th>
                                 <th class="text-end">Actions</th>
                             </tr>
                         </thead>
@@ -443,10 +436,10 @@ include __DIR__ . '/includes/navbar.php';
                                     <td class="fw-bold text-primary font-monospace" style="font-size:0.85rem;"><?= sanitize($doc['reference_number'] ?: '—') ?></td>
                                     <td class="fw-semibold text-dark" style="max-width:240px;"><?= sanitize($doc['document_title']) ?></td>
                                     <td><span class="badge bg-light text-dark border"><?= sanitize($doc['category_name']) ?></span></td>
-                                    <td><span class="small text-secondary"><?= sanitize($doc['type_name']) ?></span></td>
+                                    <td><span class="small text-secondary"><?= sanitize($doc['remarks_action'] ?: $doc['remarks'] ?: '—') ?></span></td>
                                     <td><?= sanitize($doc['origin_source'] ?: '—') ?></td>
+                                    <td><?= sanitize($doc['recipient_office'] ?: '—') ?></td>
                                     <td class="small text-nowrap"><?= date('M d, Y', strtotime($doc['document_date'])) ?></td>
-                                    <td class="small text-nowrap text-muted"><i class="bi bi-clock me-1 text-primary opacity-75"></i><?= !empty($doc['time_log']) ? date('h:i A', strtotime($doc['time_log'])) : (!empty($doc['created_at']) ? date('h:i A', strtotime($doc['created_at'])) : '—') ?></td>
                                     <td class="small text-muted"><?= sanitize($doc['encoder_name'] ?: 'System') ?></td>
                                     <td class="text-end text-nowrap">
                                         <a href="document_log.php?view=<?= $doc['id'] ?>" class="btn btn-sm btn-outline-primary-custom py-1 px-2" title="View Details">
@@ -500,15 +493,9 @@ include __DIR__ . '/includes/navbar.php';
                     </div>
 
                     <!-- Document Date -->
-                    <div class="col-md-3">
-                        <label for="document_date" class="form-label">Document Date <span class="text-danger">*</span></label>
+                    <div class="col-md-6">
+                        <label for="document_date" class="form-label">Date <span class="text-danger">*</span></label>
                         <input type="date" class="form-control" id="document_date" name="document_date" required value="<?= date('Y-m-d') ?>">
-                    </div>
-
-                    <!-- Time Log -->
-                    <div class="col-md-3">
-                        <label for="time_log" class="form-label">Time Log</label>
-                        <input type="time" class="form-control" id="time_log" name="time_log" value="<?= date('H:i') ?>">
                     </div>
 
                     <!-- Document Title -->
@@ -528,18 +515,17 @@ include __DIR__ . '/includes/navbar.php';
                         </select>
                     </div>
 
-                    <!-- Type Dropdown (Filtered by Category via JS) -->
-                    <div class="col-md-6">
-                        <label for="document_type_id" class="form-label">Document Type</label>
-                        <select class="form-select" id="document_type_id" name="document_type_id">
-                            <option value="">-- Select Category First --</option>
-                        </select>
-                    </div>
+                    <!-- Hidden Document Type -->
+                    <input type="hidden" id="document_type_id" name="document_type_id" value="0">
 
-                    <!-- Origin / Source -->
-                    <div class="col-12">
-                        <label for="origin_source" class="form-label">Origin / Source Office</label>
-                        <input type="text" class="form-control" id="origin_source" name="origin_source" placeholder="e.g. Regional Office / Division of Finance">
+                    <!-- Origin & Destination -->
+                    <div class="col-md-6">
+                        <label for="origin_source" class="form-label">Office Origin</label>
+                        <input type="text" class="form-control" id="origin_source" name="origin_source" placeholder="e.g. Regional Office">
+                    </div>
+                    <div class="col-md-6">
+                        <label for="recipient_office" class="form-label">Office Destination</label>
+                        <input type="text" class="form-control" id="recipient_office" name="recipient_office" placeholder="e.g. Division of Finance">
                     </div>
 
                     <!-- Attachment Checklist Container (Populated by JS) -->
@@ -550,8 +536,22 @@ include __DIR__ . '/includes/navbar.php';
                         </div>
                     </div>
 
+                    <!-- Remarks Action -->
+                    <div class="col-md-6">
+                        <label for="remarks_action" class="form-label">Remarks Action</label>
+                        <select class="form-select" id="remarks_action" name="remarks_action">
+                            <option value="">-- Select Action --</option>
+                            <option value="Acted upon">Acted upon</option>
+                            <option value="Routed to the responsible office">Routed to the responsible office</option>
+                            <option value="Completed">Completed</option>
+                            <option value="Released">Released</option>
+                            <option value="Filed">Filed</option>
+                            <option value="Filed by the Director">Filed by the Director</option>
+                        </select>
+                    </div>
+
                     <!-- Remarks -->
-                    <div class="col-12">
+                    <div class="col-md-6">
                         <label for="remarks" class="form-label">Remarks / Additional Notes</label>
                         <textarea class="form-control" id="remarks" name="remarks" rows="2" placeholder="Optional comments or notes..."></textarea>
                     </div>
@@ -599,10 +599,6 @@ include __DIR__ . '/includes/navbar.php';
                         <span class="badge bg-light text-dark border px-2 py-1"><?= sanitize($viewDoc['category_name']) ?></span>
                     </div>
                     <div class="col-md-6">
-                        <div class="text-muted small">Document Type</div>
-                        <div class="fw-semibold text-dark"><?= sanitize($viewDoc['type_name']) ?></div>
-                    </div>
-                    <div class="col-md-6">
                         <div class="text-muted small">Origin / Source</div>
                         <div class="fw-semibold text-dark"><?= sanitize($viewDoc['origin_source'] ?: 'N/A') ?></div>
                     </div>
@@ -610,6 +606,12 @@ include __DIR__ . '/includes/navbar.php';
                         <div class="text-muted small">Encoded By</div>
                         <div class="fw-semibold text-dark"><?= sanitize($viewDoc['encoder_name'] ?: 'System') ?> (<?= date('M d, Y h:i A', strtotime($viewDoc['created_at'])) ?>)</div>
                     </div>
+                    <?php if (!empty($viewDoc['remarks_action'])): ?>
+                    <div class="col-12">
+                        <div class="text-muted small">Remarks Action</div>
+                        <div class="fw-bold text-dark"><?= sanitize($viewDoc['remarks_action']) ?></div>
+                    </div>
+                    <?php endif; ?>
                     <?php if (!empty($viewDoc['remarks'])): ?>
                     <div class="col-12">
                         <div class="text-muted small">Remarks</div>
@@ -667,29 +669,17 @@ document.addEventListener('DOMContentLoaded', function () {
             document.getElementById('document_id').value = data.id;
             document.getElementById('reference_number').value = data.reference_number || '';
             document.getElementById('document_date').value = data.document_date;
-            document.getElementById('time_log').value = data.time_log || '';
             document.getElementById('document_title').value = data.document_title;
             document.getElementById('origin_source').value = data.origin_source || '';
+            document.getElementById('recipient_office').value = data.recipient_office || '';
+            document.getElementById('remarks_action').value = data.remarks_action || '';
             document.getElementById('remarks').value = data.remarks || '';
 
             // Trigger Category Change
             const catSelect = document.getElementById('category_id');
             catSelect.value = data.category_id;
             
-            // Fetch types and select current type
-            fetch(`api.php?action=get_types&category_id=${data.category_id}`)
-                .then(res => res.json())
-                .then(types => {
-                    const typeSelect = document.getElementById('document_type_id');
-                    typeSelect.innerHTML = '<option value="">-- Select Document Type --</option>';
-                    types.forEach(t => {
-                        const opt = document.createElement('option');
-                        opt.value = t.id;
-                        opt.textContent = t.type_name;
-                        if (t.id == data.document_type_id) opt.selected = true;
-                        typeSelect.appendChild(opt);
-                    });
-                });
+            // Document Type logic removed per new requirements
 
             const modal = new bootstrap.Modal(document.getElementById('addDocumentModal'));
             modal.show();

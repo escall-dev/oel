@@ -47,6 +47,7 @@ CREATE TABLE IF NOT EXISTS `documents` (
   `document_date` DATE NOT NULL,
   `time_log` TIME NULL DEFAULT NULL,
   `remarks` TEXT NULL,
+  `remarks_action` ENUM('Acted upon', 'Routed to the responsible office', 'Completed', 'Released', 'Filed', 'Filed by the Director') NULL DEFAULT NULL,
   `encoded_by` INT NOT NULL,
   `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (`category_id`) REFERENCES `categories`(`id`),
@@ -70,15 +71,10 @@ CREATE TABLE IF NOT EXISTS `document_attachments` (
 
 -- Seed Categories
 INSERT IGNORE INTO `categories` (`id`, `category_name`) VALUES
-(1, 'Finance and Administration Office'),
-(2, 'Bids and Awards Committee'),
-(3, 'Human Resource'),
-(4, 'With Codes'),
-(5, 'Other Legal Documents'),
-(6, 'Technical'),
-(7, 'Others');
+(1, 'Incoming'),
+(2, 'Outgoing');
 
--- Seed Document Types (23 types)
+-- Seed Document Types (23 types, all mapped to Category 1: Incoming for now)
 INSERT IGNORE INTO `document_types` (`id`, `category_id`, `type_name`) VALUES
 -- Finance and Administration Office (1-4)
 (1, 1, 'Payment'),
@@ -86,30 +82,30 @@ INSERT IGNORE INTO `document_types` (`id`, `category_id`, `type_name`) VALUES
 (3, 1, 'Cash Advance'),
 (4, 1, 'Liquidation'),
 -- Bids and Awards Committee (5)
-(5, 2, 'Procurement'),
+(5, 1, 'Procurement'),
 -- Human Resource (6-9)
-(6, 3, 'HR Forms'),
-(7, 3, 'Service Agreement'),
-(8, 3, 'Appointment'),
-(9, 3, 'Salary'),
+(6, 1, 'HR Forms'),
+(7, 1, 'Service Agreement'),
+(8, 1, 'Appointment'),
+(9, 1, 'Salary'),
 -- With Codes (10-14)
-(10, 4, 'Letter'),
-(11, 4, 'Memorandum'),
-(12, 4, 'Notice of Meeting'),
-(13, 4, 'Special Order'),
-(14, 4, 'Office Order'),
+(10, 1, 'Letter'),
+(11, 1, 'Memorandum'),
+(12, 1, 'Notice of Meeting'),
+(13, 1, 'Special Order'),
+(14, 1, 'Office Order'),
 -- Other Legal Documents (15-17)
-(15, 5, 'Resolution'),
-(16, 5, 'Circular'),
-(17, 5, 'MOA/MOU'),
+(15, 1, 'Resolution'),
+(16, 1, 'Circular'),
+(17, 1, 'MOA/MOU'),
 -- Technical (18-22)
-(18, 6, 'Report'),
-(19, 6, 'Request'),
-(20, 6, 'Proposal'),
-(21, 6, 'Concept Note'),
-(22, 6, 'Briefer'),
+(18, 1, 'Report'),
+(19, 1, 'Request'),
+(20, 1, 'Proposal'),
+(21, 1, 'Concept Note'),
+(22, 1, 'Briefer'),
 -- Others (23)
-(23, 7, 'Certification');
+(23, 1, 'Certification');
 
 -- Seed Attachment Items
 INSERT IGNORE INTO `attachment_items` (`id`, `document_type_id`, `item_name`) VALUES

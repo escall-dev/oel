@@ -7,13 +7,14 @@ $user = currentUser();
 // Metrics Queries
 
 $totalDocs = $pdo->query("SELECT COUNT(*) FROM documents")->fetchColumn();
-$totalCategories = $pdo->query("SELECT COUNT(*) FROM categories")->fetchColumn();
+$totalCategories = $pdo->query("SELECT COUNT(*) FROM categories WHERE id IN (1, 2)")->fetchColumn();
 
 // Category Summary Stats
 $catStmt = $pdo->query("
     SELECT c.category_name, COUNT(d.id) AS doc_count 
     FROM categories c 
     LEFT JOIN documents d ON c.id = d.category_id 
+    WHERE c.id IN (1, 2)
     GROUP BY c.id 
     ORDER BY doc_count DESC, c.category_name ASC
 ");
@@ -21,10 +22,9 @@ $categoryStats = $catStmt->fetchAll();
 
 // Recent Entries (Latest 10)
 $recentStmt = $pdo->query("
-    SELECT d.*, c.category_name, dt.type_name, u.full_name AS encoder_name
+    SELECT d.*, c.category_name, u.full_name AS encoder_name
     FROM documents d
     JOIN categories c ON d.category_id = c.id
-    LEFT JOIN document_types dt ON d.document_type_id = dt.id
     LEFT JOIN users u ON d.encoded_by = u.id
     ORDER BY d.id DESC
     LIMIT 10
@@ -93,19 +93,17 @@ include __DIR__ . '/includes/navbar.php';
                     <div class="table-responsive">
                         <table class="table table-custom align-middle">
                             <thead>
-                                <tr>
                                     <th>Ref #</th>
                                     <th>Title</th>
-                                    <th>Category / Type</th>
+                                    <th>Category</th>
                                     <th>Date</th>
-                                    <th>Time Log</th>
                                     <th class="text-end">Action</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <?php if (empty($recentEntries)): ?>
                                 <tr>
-                                    <td colspan="7" class="text-center py-4 text-muted">
+                                    <td colspan="5" class="text-center py-4 text-muted">
                                         <i class="bi bi-inbox fs-2 d-block mb-1 opacity-50"></i>
                                         No log entries found. Start by adding a document log.
                                     </td>
@@ -120,10 +118,8 @@ include __DIR__ . '/includes/navbar.php';
                                         </td>
                                         <td>
                                             <span class="d-block fw-semibold text-dark small"><?= sanitize($entry['category_name']) ?></span>
-                                            <span class="d-block text-muted small" style="font-size:0.75rem;"><?= sanitize($entry['type_name']) ?></span>
                                         </td>
                                         <td class="text-nowrap small text-muted"><?= date('M d, Y', strtotime($entry['document_date'])) ?></td>
-                                        <td class="text-nowrap small text-muted"><i class="bi bi-clock me-1 opacity-75"></i><?= !empty($entry['time_log']) ? date('h:i A', strtotime($entry['time_log'])) : (!empty($entry['created_at']) ? date('h:i A', strtotime($entry['created_at'])) : '—') ?></td>
                                         <td class="text-end">
                                             <a href="document_log.php?view=<?= $entry['id'] ?>" class="btn btn-sm btn-outline-primary-custom py-1 px-2">
                                                 <i class="bi bi-eye me-1"></i> View
