@@ -35,7 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $role = trim($_POST['role'] ?? 'viewer');
         $password = trim($_POST['password'] ?? '');
 
-        if (empty($username) || empty($fullName) || !in_array($role, ['admin', 'encoder', 'viewer'])) {
+        if (empty($username) || empty($fullName) || !in_array($role, ['superadmin', 'admin', 'encoder', 'viewer'])) {
             setFlash('danger', 'Please provide valid Employee ID, Full Name, and Role.');
             header("Location: users.php");
             exit();
@@ -190,7 +190,8 @@ include __DIR__ . '/includes/navbar.php';
                     <select class="form-select" id="user_role" name="role" required>
                         <option value="viewer">Viewer (Read Only)</option>
                         <option value="encoder">Encoder (Add & Edit Documents)</option>
-                        <option value="admin">Admin (Full System Access)</option>
+                        <option value="admin">Admin (System Access)</option>
+                        <option value="superadmin">Superadmin (Full System Access)</option>
                     </select>
                 </div>
 
