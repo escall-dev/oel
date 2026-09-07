@@ -53,6 +53,12 @@ function currentUser() {
 function hasRole($roles) {
     if (!isLoggedIn()) return false;
     $currentRole = $_SESSION['role'] ?? '';
+    
+    // Superadmin has all permissions
+    if ($currentRole === 'superadmin') {
+        return true;
+    }
+
     if (is_array($roles)) {
         return in_array($currentRole, $roles);
     }

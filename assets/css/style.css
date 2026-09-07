@@ -237,6 +237,12 @@ body {
   border-radius: 4px;
 }
 
+.badge-role-superadmin {
+  background-color: #8b0000;
+  color: #ffffff;
+  border: 1px solid #5a0000;
+}
+
 .badge-role-admin {
   background-color: var(--primary-color);
   color: #ffffff;

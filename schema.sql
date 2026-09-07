@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS `users` (
   `username` VARCHAR(50) NOT NULL UNIQUE,
   `password` VARCHAR(255) NOT NULL,
   `full_name` VARCHAR(100) NOT NULL,
-  `role` ENUM('admin', 'encoder', 'viewer') NOT NULL DEFAULT 'viewer',
+  `role` ENUM('superadmin', 'admin', 'encoder', 'viewer') NOT NULL DEFAULT 'viewer',
   `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -179,4 +179,18 @@ INSERT IGNORE INTO `attachment_items` (`id`, `document_type_id`, `item_name`) VA
 -- Default Superadmin User (061920 / escall)
 -- Password hash for 'escall'
 INSERT IGNORE INTO `users` (`id`, `username`, `password`, `full_name`, `role`) VALUES
-(1, '061920', '$2y$10$iM1vNq3h4j8D8Kz9A1L.EeC5aM0zS0R1Q2P3O4N5M6L7K8J9I0H1G', 'Super Admin', 'admin');
+(1, '061920', '$2y$10$iM1vNq3h4j8D8Kz9A1L.EeC5aM0zS0R1Q2P3O4N5M6L7K8J9I0H1G', 'Super Admin', 'superadmin');
+
+-- Seed Personnel Users (Default Password: qpteo, Role: viewer)
+INSERT IGNORE INTO `users` (`username`, `full_name`, `password`, `role`) VALUES
+('iking', 'Ferdinand L. Rellorosa, CEPS', '$2y$10$ISmhEpXdI9PvM6xh3NUWOe8LGOQ0Crmfewx5BW1xa.4WoIvVnZ0HS', 'viewer'),
+('diane', 'Diane G. Francisco, PDO IV', '$2y$10$ISmhEpXdI9PvM6xh3NUWOe8LGOQ0Crmfewx5BW1xa.4WoIvVnZ0HS', 'viewer'),
+('kristel', 'Marie Kristel B. Corpin, SEPS', '$2y$10$ISmhEpXdI9PvM6xh3NUWOe8LGOQ0Crmfewx5BW1xa.4WoIvVnZ0HS', 'viewer'),
+('cristy', 'Cristy A. Mendoza, PDO III', '$2y$10$ISmhEpXdI9PvM6xh3NUWOe8LGOQ0Crmfewx5BW1xa.4WoIvVnZ0HS', 'viewer'),
+('vj', 'Vernie Glojun T. Lasmarias, PDO III', '$2y$10$ISmhEpXdI9PvM6xh3NUWOe8LGOQ0Crmfewx5BW1xa.4WoIvVnZ0HS', 'viewer'),
+('dave', 'Lester Dave G. Pua, PDO III', '$2y$10$ISmhEpXdI9PvM6xh3NUWOe8LGOQ0Crmfewx5BW1xa.4WoIvVnZ0HS', 'viewer'),
+('chris', 'Christopher E. Siscar, PDO I', '$2y$10$ISmhEpXdI9PvM6xh3NUWOe8LGOQ0Crmfewx5BW1xa.4WoIvVnZ0HS', 'viewer'),
+('jillian', 'Clarence Jillian Villena, EPS I', '$2y$10$ISmhEpXdI9PvM6xh3NUWOe8LGOQ0Crmfewx5BW1xa.4WoIvVnZ0HS', 'viewer'),
+('venus', 'Venus Mae D. Cabuñalda, ADAS I', '$2y$10$ISmhEpXdI9PvM6xh3NUWOe8LGOQ0Crmfewx5BW1xa.4WoIvVnZ0HS', 'viewer'),
+('alex', 'Alexander Joerenz E. Escallente', '$2y$10$ISmhEpXdI9PvM6xh3NUWOe8LGOQ0Crmfewx5BW1xa.4WoIvVnZ0HS', 'viewer');
+

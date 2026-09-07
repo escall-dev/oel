@@ -70,10 +70,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             <form method="POST" action="login.php" autocomplete="off">
                 <div class="mb-3">
-                    <label for="username" class="form-label">Employee ID</label>
+                    <label for="username" class="form-label">Username</label>
                     <div class="input-group">
                         <span class="input-group-text bg-light text-muted"><i class="bi bi-person-badge"></i></span>
-                        <input type="text" class="form-control" id="username" name="username" placeholder="e.g. 1234567" required autofocus value="<?= sanitize($_POST['username'] ?? '') ?>">
+                        <input type="text" class="form-control" id="username" name="username" placeholder="e.g. qpteo" required autofocus value="<?= sanitize($_POST['username'] ?? '') ?>">
                     </div>
                 </div>
 
