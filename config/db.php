@@ -6,11 +6,12 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 
 define('DB_HOST', 'localhost');
-define('DB_USER', 'u227963292_qpteo_logbook');
-define('DB_PASS', 'Qpteologbook1994');
-define('DB_NAME', 'u227963292_qpteo_logbook');
+define('DB_USER', 'root');
+define('DB_PASS', '');
+define('DB_NAME', 'qpteo_oel');
 
-function getDBConnection() {
+function getDBConnection()
+{
     static $pdo = null;
     if ($pdo === null) {
         try {
@@ -36,12 +37,15 @@ function getDBConnection() {
 $pdo = getDBConnection();
 
 // Authentication Helpers
-function isLoggedIn() {
+function isLoggedIn()
+{
     return isset($_SESSION['user_id']) && !empty($_SESSION['user_id']);
 }
 
-function currentUser() {
-    if (!isLoggedIn()) return null;
+function currentUser()
+{
+    if (!isLoggedIn())
+        return null;
     return [
         'id' => $_SESSION['user_id'],
         'username' => $_SESSION['username'] ?? '',
@@ -50,10 +54,12 @@ function currentUser() {
     ];
 }
 
-function hasRole($roles) {
-    if (!isLoggedIn()) return false;
+function hasRole($roles)
+{
+    if (!isLoggedIn())
+        return false;
     $currentRole = $_SESSION['role'] ?? '';
-    
+
     // Superadmin has all permissions
     if ($currentRole === 'superadmin') {
         return true;
@@ -65,14 +71,16 @@ function hasRole($roles) {
     return $currentRole === $roles;
 }
 
-function requireLogin() {
+function requireLogin()
+{
     if (!isLoggedIn()) {
         header("Location: login.php");
         exit();
     }
 }
 
-function requireRole($roles) {
+function requireRole($roles)
+{
     requireLogin();
     if (!hasRole($roles)) {
         setFlash('danger', 'Unauthorized access: You do not have permission to perform this action.');
@@ -81,18 +89,21 @@ function requireRole($roles) {
     }
 }
 
-function sanitize($data) {
+function sanitize($data)
+{
     return htmlspecialchars(trim($data ?? ''), ENT_QUOTES, 'UTF-8');
 }
 
-function setFlash($type, $message) {
+function setFlash($type, $message)
+{
     $_SESSION['flash'] = [
         'type' => $type, // success, danger, warning, info
         'message' => $message
     ];
 }
 
-function getFlash() {
+function getFlash()
+{
     if (isset($_SESSION['flash'])) {
         $flash = $_SESSION['flash'];
         unset($_SESSION['flash']);
@@ -102,7 +113,8 @@ function getFlash() {
 }
 
 // Upload Helper - Stores files in uploads/YYYY/MM/
-function saveUploadedFile($fileArray) {
+function saveUploadedFile($fileArray)
+{
     if (!$fileArray || $fileArray['error'] !== UPLOAD_ERR_OK) {
         return null;
     }
@@ -110,7 +122,7 @@ function saveUploadedFile($fileArray) {
     $year = date('Y');
     $month = date('m');
     $uploadDir = __DIR__ . "/../uploads/$year/$month/";
-    
+
     if (!file_exists($uploadDir)) {
         mkdir($uploadDir, 0777, true);
     }
@@ -119,7 +131,7 @@ function saveUploadedFile($fileArray) {
     $originalName = pathinfo($fileArray['name'], PATHINFO_FILENAME);
     $cleanName = preg_replace('/[^a-zA-Z0-9_-]/', '_', $originalName);
     $uniqueFileName = $cleanName . '_' . time() . '_' . rand(1000, 9999) . ($fileExt ? '.' . $fileExt : '');
-    
+
     $targetPath = $uploadDir . $uniqueFileName;
     $relativePath = "uploads/$year/$month/$uniqueFileName";
 
@@ -130,8 +142,10 @@ function saveUploadedFile($fileArray) {
 }
 
 // Attachment File Deletion Helper - Ensures physical files are unlinked ONLY if no other document attachment references the path
-function deleteAttachmentFile($pdo, $filePath, $excludeAttId = 0) {
-    if (empty($filePath)) return;
+function deleteAttachmentFile($pdo, $filePath, $excludeAttId = 0)
+{
+    if (empty($filePath))
+        return;
     $stmt = $pdo->prepare("SELECT COUNT(*) FROM document_attachments WHERE file_path = :fp AND id != :exclude_id");
     $stmt->execute([':fp' => $filePath, ':exclude_id' => $excludeAttId]);
     if ($stmt->fetchColumn() == 0) {
