@@ -1,6 +1,11 @@
 <?php
 require_once __DIR__ . '/config/db.php';
-requireRole(['admin', 'superadmin']);
+$userRole = strtolower(trim($_SESSION['role'] ?? ''));
+if (!in_array($userRole, ['admin', 'superadmin', 'super_admin', 'super admin']) && !hasRole(['admin', 'superadmin', 'super_admin'])) {
+    setFlash('danger', 'Unauthorized access: You do not have permission to perform this action.');
+    header("Location: index.php");
+    exit();
+}
 
 // Handle User Actions (Add / Edit / Delete)
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {

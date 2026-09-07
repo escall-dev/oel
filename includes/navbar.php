@@ -2,6 +2,8 @@
 require_once __DIR__ . '/../config/db.php';
 $user = currentUser();
 $currentPage = basename($_SERVER['PHP_SELF']);
+$userRole = strtolower(trim($user['role'] ?? ''));
+$canManageUsers = (in_array($userRole, ['admin', 'superadmin', 'super_admin', 'super admin']) || hasRole(['admin', 'superadmin', 'super_admin']));
 ?>
 <nav class="navbar navbar-expand-lg navbar-dark navbar-custom sticky-top mb-4">
     <div class="container-fluid px-4">
@@ -33,7 +35,7 @@ $currentPage = basename($_SERVER['PHP_SELF']);
                         <i class="bi bi-file-earmark-excel me-1"></i> Export Data
                     </a>
                 </li>
-                <?php if (hasRole(['admin', 'superadmin'])): ?>
+                <?php if ($canManageUsers): ?>
                 <li class="nav-item">
                     <a class="nav-link <?= ($currentPage === 'users.php') ? 'active' : '' ?>" href="users.php">
                         <i class="bi bi-people me-1"></i> User Management

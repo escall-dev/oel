@@ -58,17 +58,18 @@ function hasRole($roles)
 {
     if (!isLoggedIn())
         return false;
-    $currentRole = $_SESSION['role'] ?? '';
+    $currentRole = strtolower(trim($_SESSION['role'] ?? ''));
 
     // Superadmin has all permissions
-    if ($currentRole === 'superadmin') {
+    if (in_array($currentRole, ['superadmin', 'super_admin', 'super admin'])) {
         return true;
     }
 
     if (is_array($roles)) {
-        return in_array($currentRole, $roles);
+        $normalizedRoles = array_map(function($r) { return strtolower(trim($r)); }, $roles);
+        return in_array($currentRole, $normalizedRoles);
     }
-    return $currentRole === $roles;
+    return $currentRole === strtolower(trim($roles));
 }
 
 function requireLogin()
