@@ -41,12 +41,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $password = trim($_POST['password'] ?? '');
 
         if (empty($username) || empty($fullName) || !in_array($role, ['superadmin', 'admin', 'encoder', 'viewer'])) {
-            setFlash('danger', 'Please provide valid Employee ID, Full Name, and Role.');
+            setFlash('danger', 'Please provide valid Username, Full Name, and Role.');
             header("Location: users.php");
             exit();
         }
 
-        // Check Employee ID uniqueness
+        // Check Username uniqueness
         if ($userId > 0) {
             $stmtCheck = $pdo->prepare("SELECT COUNT(*) FROM users WHERE username = :u AND id != :id");
             $stmtCheck->execute([':u' => $username, ':id' => $userId]);
@@ -56,7 +56,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         if ($stmtCheck->fetchColumn() > 0) {
-            setFlash('danger', "Employee ID '$username' is already registered to another user.");
+            setFlash('danger', "Username '$username' is already registered to another user.");
             header("Location: users.php");
             exit();
         }
@@ -127,7 +127,7 @@ include __DIR__ . '/includes/navbar.php';
                     <thead>
                         <tr>
                             <th>ID</th>
-                            <th>Employee ID (Username)</th>
+                            <th>Username</th>
                             <th>Full Name</th>
                             <th>Role Permission</th>
                             <th>Created Date</th>
@@ -181,8 +181,8 @@ include __DIR__ . '/includes/navbar.php';
                 <input type="hidden" name="user_id" id="user_id" value="0">
 
                 <div class="mb-3">
-                    <label for="user_username" class="form-label">Employee ID (Username) <span class="text-danger">*</span></label>
-                    <input type="text" class="form-control" id="user_username" name="username" required placeholder="e.g. 061920">
+                    <label for="user_username" class="form-label">Username <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="user_username" name="username" required placeholder="e.g. qpteo">
                 </div>
 
                 <div class="mb-3">

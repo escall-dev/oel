@@ -14,7 +14,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $password = trim($_POST['password'] ?? '');
 
     if (empty($username) || empty($password)) {
-        $error = 'Please enter both Employee ID and password.';
+        $error = 'Please enter both username and password.';
     } else {
         $stmt = $pdo->prepare("SELECT * FROM users WHERE username = :username LIMIT 1");
         $stmt->execute([':username' => $username]);
@@ -30,7 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             header("Location: index.php");
             exit();
         } else {
-            $error = 'Invalid Employee ID or password. Please try again.';
+            $error = 'Invalid username or password. Please try again.';
         }
     }
 }
