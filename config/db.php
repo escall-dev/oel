@@ -6,9 +6,9 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 
 define('DB_HOST', 'localhost');
-define('DB_USER', 'root');
-define('DB_PASS', '');
-define('DB_NAME', 'qpteo_logbook_db');
+define('DB_USER', 'u227963292_qpteo_logbook');
+define('DB_PASS', 'Qpteologbook1994');
+define('DB_NAME', 'u227963292_qpteo_logbook');
 
 function getDBConnection() {
     static $pdo = null;
