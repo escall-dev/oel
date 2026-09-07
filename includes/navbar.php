@@ -33,7 +33,7 @@ $currentPage = basename($_SERVER['PHP_SELF']);
                         <i class="bi bi-file-earmark-excel me-1"></i> Export Data
                     </a>
                 </li>
-                <?php if (hasRole('admin')): ?>
+                <?php if (hasRole(['admin', 'superadmin'])): ?>
                 <li class="nav-item">
                     <a class="nav-link <?= ($currentPage === 'users.php') ? 'active' : '' ?>" href="users.php">
                         <i class="bi bi-people me-1"></i> User Management

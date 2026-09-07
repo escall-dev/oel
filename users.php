@@ -1,6 +1,6 @@
 <?php
 require_once __DIR__ . '/config/db.php';
-requireRole('admin');
+requireRole(['admin', 'superadmin']);
 
 // Handle User Actions (Add / Edit / Delete)
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {

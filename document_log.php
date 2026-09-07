@@ -7,7 +7,7 @@ $user = currentUser();
 // Handle Form Submissions (Add / Edit / Delete)
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Only Admin & Encoder can create/edit/delete
-    if (!hasRole(['admin', 'encoder'])) {
+    if (!hasRole(['admin', 'superadmin', 'encoder'])) {
         setFlash('danger', 'Viewer role cannot modify document entries.');
         header("Location: document_log.php");
         exit();
@@ -17,7 +17,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // DELETE DOCUMENT
     if ($formAction === 'delete') {
-        if (!hasRole('admin')) {
+        if (!hasRole(['admin', 'superadmin'])) {
             setFlash('danger', 'Only administrators can delete log records.');
             header("Location: document_log.php");
             exit();
@@ -41,7 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if ($formAction === 'bulk_delete') {
-        if (!hasRole('admin')) {
+        if (!hasRole(['admin', 'superadmin'])) {
             setFlash('danger', 'Only administrators can delete log records.');
             header("Location: document_log.php");
             exit();
